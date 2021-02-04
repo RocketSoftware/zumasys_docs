@@ -65,7 +65,6 @@ jobs:
         uses: gaurav-nelson/github-action-markdown-link-check@1.0.8
         id: mlc
         with:
-          folder-path: ${{ env.CHECK_DIR }}
           config-file: .github/link-checker-config.json
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
