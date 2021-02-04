@@ -56,18 +56,19 @@ jobs:
         uses: elliotforbes/broken-link-checker@1.0.2
         with:
           url: ${{ env.CHECK_WEBSITE }}
+          cmd_params: "--exclude=google.com --buffer-size=8192 --max-connections=10 --color=always --verbose"
 
-      - name: Create issue for broken links
-        if: failure()
-        id: create-issue
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHECK_REPO: ${{ env.CHECK_REPO }}
-          MAIN_REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.run_id }}
-        with:
-          filename: .github/link-checker-issue-template.md
+      # - name: Create issue for broken links
+      #   if: failure()
+      #   id: create-issue
+      #   uses: JasonEtco/create-an-issue@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CHECK_REPO: ${{ env.CHECK_REPO }}
+      #     MAIN_REPO: ${{ github.repository }}
+      #     RUN_ID: ${{ github.run_id }}
+      #   with:
+      #     filename: .github/link-checker-issue-template.md
 
   markdown-link-check:
     name: Check markdown links
@@ -104,14 +105,14 @@ jobs:
           use-verbose-mode: 'no'
           folder-path: 'site/'
 
-      - name: Create issue for broken links
-        if: failure()
-        id: create-issue
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CHECK_REPO: ${{ env.CHECK_REPO }}
-          MAIN_REPO: ${{ github.repository }}
-          RUN_ID: ${{ github.run_id }}
-        with:
-          filename: .github/link-checker-issue-template.md
+      # - name: Create issue for broken links
+      #   if: failure()
+      #   id: create-issue
+      #   uses: JasonEtco/create-an-issue@v2
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     CHECK_REPO: ${{ env.CHECK_REPO }}
+      #     MAIN_REPO: ${{ github.repository }}
+      #     RUN_ID: ${{ github.run_id }}
+      #   with:
+      #     filename: .github/link-checker-issue-template.md
