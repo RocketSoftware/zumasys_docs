@@ -13,11 +13,7 @@
     "replacementPatterns": [
         {
             "pattern": "^/",
-            "replacement": "https://docs.zumasys.com/"
-        },
-        {
-            "pattern": "^../jbase/",
-            "replacement": "https://docs.zumasys.com/jbase/"
+            "replacement": "{{BASEURL}}/"
         }
     ],
     "retryOn429": true,

@@ -9,18 +9,16 @@ on:
   workflow_dispatch: # trigger manually
     inputs:
         repo:
-          description: 'Repository to check'     
+          description: 'Repository to check'
           required: true
           default: zumasys/docs
         branch:
           description: 'Branch to check'
           required: true
           default: link-check-test
-  
-  
+
 # globals
 env:
-  # music-encoding
   CHECK_WEBSITE: https://docs.zumasys.com
   CHECK_REPO: zumasys/docs
   CHECK_BRANCH: link-check-test
@@ -35,8 +33,8 @@ jobs:
       - uses: technote-space/broken-link-checker-action@v2
         with:
           target: ${{ env.CHECK_WEBSITE }}
-      
-      
+          recursive: true
+
   markdown-link-check:
     name: Check markdown links
     runs-on: ubuntu-latest
@@ -67,10 +65,11 @@ jobs:
         uses: gaurav-nelson/github-action-markdown-link-check@1.0.8
         id: mlc
         with:
-          folder-path: ${{ env.CHECK_DIR }}    # remove on music-encoding repo
+          folder-path: ${{ env.CHECK_DIR }}
           config-file: .github/link-checker-config.json
           use-quiet-mode: 'yes'
           use-verbose-mode: 'yes'
+          folder-path: 'site/'
 
       - name: Create issue for broken links
         if: failure()
