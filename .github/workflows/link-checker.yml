@@ -1,0 +1,82 @@
+name: Link Checker
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # run daily at midnight
+  workflow_dispatch: # trigger manually
+    inputs:
+        repo:
+          description: 'Repository to check'     
+          required: true
+          default: zumasys/docs
+        branch:
+          description: 'Branch to check'
+          required: true
+          default: link-check-test
+  
+  
+# globals
+env:
+  # music-encoding
+  CHECK_WEBSITE: https://docs.zumasys.com
+  CHECK_REPO: zumasys/docs
+  CHECK_BRANCH: link-check-test
+  CHECK_DIR: check-dir
+
+jobs:
+  website_link_check:
+    name: Check website links
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: technote-space/broken-link-checker-action@v2
+        with:
+          target: ${{ env.CHECK_WEBSITE }}
+      
+      
+  markdown-link-check:
+    name: Check markdown links
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Set variables
+        run: |
+          if [[ "${{ github.event.inputs.repo }}" != '' ]] ; then
+            echo "Setting repo: ${{ github.event.inputs.repo }}"
+            echo "CHECK_REPO=${{ github.event.inputs.repo }}" >> $GITHUB_ENV
+          fi
+          if [[ "${{ github.event.inputs.branch }}" != '' ]] ; then
+            echo "Setting branch: ${{ github.event.inputs.branch }}"
+            echo "CHECK_BRANCH=${{ github.event.inputs.branch }}" >> $GITHUB_ENV
+          fi
+      
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Checkout CHECK_REPO into CHECK_DIR
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.CHECK_REPO }}
+          ref: ${{ env.CHECK_BRANCH }}
+          path: ${{ env.CHECK_DIR }}
+
+      - name: Run markdown link check
+        uses: gaurav-nelson/github-action-markdown-link-check@1.0.8
+        id: mlc
+        with:
+          folder-path: ${{ env.CHECK_DIR }}    # remove on music-encoding repo
+          config-file: .github/link-checker-config.json
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+
+      - name: Create issue for broken links
+        if: failure()
+        id: create-issue
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_REPO: ${{ env.CHECK_REPO }}
+          MAIN_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        with:
+          filename: .github/link-checker-issue-template.md

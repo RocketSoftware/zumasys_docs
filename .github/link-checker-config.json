@@ -1,0 +1,28 @@
+{
+    "ignorePatterns": [
+        {
+            "pattern": "^(http|https)://localhost"
+        },
+        {
+            "pattern": "mailto:{{.*}}"
+        },
+        {
+            "pattern": "https://github.com/{{.*}}/actions/runs/{{.*}}"
+        }
+    ],
+    "replacementPatterns": [
+        {
+            "pattern": "^/",
+            "replacement": "https://docs.zumasys.com/"
+        },
+        {
+            "pattern": "^../jbase/",
+            "replacement": "https://docs.zumasys.com/jbase/"
+        }
+    ],
+    "retryOn429": true,
+    "aliveStatusCodes": [
+        200,
+        206
+    ]
+}
