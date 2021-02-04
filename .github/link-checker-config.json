@@ -8,6 +8,9 @@
         },
         {
             "pattern": "https://github.com/{{.*}}/actions/runs/{{.*}}"
+        },
+        {
+            "pattern": "(WWW.INFO|www.info)"
         }
     ],
     "replacementPatterns": [

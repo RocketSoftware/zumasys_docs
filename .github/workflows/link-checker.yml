@@ -26,19 +26,53 @@ env:
 
 jobs:
   website_link_check:
-    name: Check website links
+    name: Check for broken links
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: technote-space/broken-link-checker-action@v2
+      - name: Set variables
+        run: |
+          if [[ "${{ github.event.inputs.repo }}" != '' ]] ; then
+            echo "Setting repo: ${{ github.event.inputs.repo }}"
+            echo "CHECK_REPO=${{ github.event.inputs.repo }}" >> $GITHUB_ENV
+          fi
+          if [[ "${{ github.event.inputs.branch }}" != '' ]] ; then
+            echo "Setting branch: ${{ github.event.inputs.branch }}"
+            echo "CHECK_BRANCH=${{ github.event.inputs.branch }}" >> $GITHUB_ENV
+          fi
+      
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+
+      - name: Checkout CHECK_REPO into CHECK_DIR
+        uses: actions/checkout@v2
         with:
-          target: ${{ env.CHECK_WEBSITE }}
-          recursive: true
+          repository: ${{ env.CHECK_REPO }}
+          ref: ${{ env.CHECK_BRANCH }}
+          path: ${{ env.CHECK_DIR }}
+
+      - name: Check for broken links
+        id: link-report
+        uses: elliotforbes/broken-link-checker@1.0.2
+        with:
+          url: ${{ env.CHECK_WEBSITE }}
+
+      - name: Create issue for broken links
+        if: failure()
+        id: create-issue
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECK_REPO: ${{ env.CHECK_REPO }}
+          MAIN_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        with:
+          filename: .github/link-checker-issue-template.md
 
   markdown-link-check:
     name: Check markdown links
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Set variables
         run: |
@@ -67,7 +101,7 @@ jobs:
         with:
           config-file: .github/link-checker-config.json
           use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
+          use-verbose-mode: 'no'
           folder-path: 'site/'
 
       - name: Create issue for broken links
