@@ -1,6 +1,9 @@
 name: Link Checker
 
 on:
+  push:
+    branches:
+      - link-check-test
   schedule:
     - cron: '0 0 * * *'  # run daily at midnight
   workflow_dispatch: # trigger manually
